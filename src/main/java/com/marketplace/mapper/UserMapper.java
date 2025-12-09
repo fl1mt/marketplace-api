@@ -1,0 +1,14 @@
+package com.marketplace.mapper;
+
+import com.marketplace.dto.UserRequestDTO;
+import com.marketplace.dto.UserResponseDTO;
+import com.marketplace.entity.User;
+import org.mapstruct.Mapper;
+
+@Mapper(componentModel = "string")
+public interface UserMapper {
+
+    User toEntity(UserRequestDTO requestDTO);
+
+    UserResponseDTO toResponseDTO(User user);
+}

@@ -1,8 +1,5 @@
 package com.marketplace.dto;
 
-import com.marketplace.entity.User;
-import jakarta.persistence.*;
-
 import java.util.UUID;
 
 public class DeliveryAddressResponseDTO {
