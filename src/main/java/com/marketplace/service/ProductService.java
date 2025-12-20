@@ -2,6 +2,8 @@ package com.marketplace.service;
 import com.marketplace.dto.ProductRequestDTO;
 import com.marketplace.dto.ProductResponseDTO;
 import com.marketplace.entity.Product;
+import com.marketplace.exceptions.BadRequestException;
+import com.marketplace.exceptions.NotFoundException;
 import com.marketplace.mapper.ProductMapper;
 import com.marketplace.repository.ProductsRepository;
 import org.springframework.stereotype.Service;
@@ -41,10 +43,10 @@ public class ProductService {
 
     public ProductResponseDTO updateProduct(UUID productId, ProductRequestDTO productRequestDTO){
         Product product = productsRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found!"));
+                .orElseThrow(() -> new NotFoundException("Product not found!"));
 
         if (isSame(product, productRequestDTO)) {
-            throw new IllegalArgumentException("No changes detected");
+            throw new BadRequestException("No changes detected");
         }
 
         productMapper.updateEntityFromDto(productRequestDTO, product);

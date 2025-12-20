@@ -5,11 +5,11 @@ import com.marketplace.dto.ReviewResponseDTO;
 import com.marketplace.entity.Product;
 import com.marketplace.entity.Review;
 import com.marketplace.entity.User;
-import com.marketplace.exceptions.DuplicateException;
+import com.marketplace.exceptions.BadRequestException;
+import com.marketplace.exceptions.NotFoundException;
 import com.marketplace.mapper.ReviewMapper;
 import com.marketplace.repository.ProductsRepository;
 import com.marketplace.repository.ReviewRepository;
-import jakarta.transaction.TransactionScoped;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -38,11 +38,11 @@ public class ReviewService {
     public ReviewResponseDTO createProductReview(UUID userId, UUID productId, ReviewRequestDTO reviewRequestDTO){
         User user = dataAuthService.checkUsersId(userId);
         Product product = productsRepository.findByIdForUpdate(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
 
         if (reviewRepository
                 .existsByUserIdAndProductId(userId, productId)) {
-            throw new DuplicateException("User already left a review for this product");
+            throw new BadRequestException("User already left a review for this product");
         }
 
         Review review = reviewMapper.toEntity(reviewRequestDTO);
@@ -55,7 +55,10 @@ public class ReviewService {
     }
 
     public List<ReviewResponseDTO> getReviewsByProduct(UUID productId){
-        List<Review> reviews = reviewRepository.findAllByProductId(productId);
+        Product product = productsRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found!"));
+
+        List<Review> reviews = reviewRepository.findAllByProductId(product.getId());
         return reviewMapper.toResponseDtoList(reviews);
     }
 
