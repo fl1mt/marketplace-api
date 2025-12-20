@@ -1,6 +1,7 @@
 package com.marketplace.service;
 import com.marketplace.entity.DeliveryAddress;
 import com.marketplace.entity.User;
+import com.marketplace.exceptions.NotFoundException;
 import com.marketplace.repository.DeliveryAddressesRepository;
 import com.marketplace.repository.UsersRepository;
 import org.springframework.data.elasticsearch.ResourceNotFoundException;
@@ -18,12 +19,12 @@ public class DataAuthService {
     }
     public User checkUsersId(UUID userId){
         User user = usersRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found or access denied"));
+                .orElseThrow(() -> new NotFoundException("User not found or access denied"));
         return user;
     }
     public DeliveryAddress checkUsersDeliveryAddress(UUID deliveryAddressId, UUID userId){
         DeliveryAddress deliveryAddress = deliveryAddressesRepository.findByIdAndUserId(deliveryAddressId, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found or access denied"));
+                .orElseThrow(() -> new NotFoundException("Address not found or access denied"));
         return deliveryAddress;
     }
 }

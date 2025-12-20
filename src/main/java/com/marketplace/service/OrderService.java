@@ -5,6 +5,7 @@ import com.marketplace.dto.OrderItemResponseDTO;
 import com.marketplace.dto.OrderRequestDTO;
 import com.marketplace.dto.OrderResponseDTO;
 import com.marketplace.entity.*;
+import com.marketplace.exceptions.NotFoundException;
 import com.marketplace.mapper.OrderItemMapper;
 import com.marketplace.mapper.OrderMapper;
 import com.marketplace.repository.OrderItemsRepository;
@@ -63,7 +64,7 @@ public class OrderService {
 
         for (OrderItemRequestDTO itemDTO : orderRequestDTO.getItems()){
             Product product = productsRepository.findById(itemDTO.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found!" + itemDTO.getProductId()));
+                    .orElseThrow(() -> new NotFoundException("Product not found! id: " + itemDTO.getProductId()));
 
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(savedOrder);
