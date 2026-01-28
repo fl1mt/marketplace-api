@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/orders")
+@RequestMapping("api/v1/orders")
 public class OrderController {
     private final OrderService orderService;
     public OrderController(OrderService orderService) {

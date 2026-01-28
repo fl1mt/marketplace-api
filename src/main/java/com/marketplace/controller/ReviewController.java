@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/products/{productId}/reviews")
+@RequestMapping("api/v1/products/{productId}/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
     public ReviewController(ReviewService reviewService) {

@@ -4,8 +4,6 @@ import com.marketplace.dto.UserAuthResponseDTO;
 import com.marketplace.dto.UserRegisterRequestDTO;
 import com.marketplace.dto.UserResponseDTO;
 import com.marketplace.entity.User;
-import com.marketplace.exceptions.BadRequestException;
-import com.marketplace.exceptions.NotFoundException;
 import com.marketplace.mapper.UserMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,6 +11,7 @@ import io.jsonwebtoken.security.Keys;
 import com.marketplace.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +40,7 @@ public class AuthService {
     public UserAuthResponseDTO login(String email, String password) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new BadCredentialsException("Invalid data");
@@ -62,9 +61,8 @@ public class AuthService {
     @Transactional
     public UserResponseDTO register(UserRegisterRequestDTO request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new BadRequestException("User with this email already exists");
+            throw new RuntimeException("User with this email already exists");
         }
-        // add mapper
 
         User user = new User();
         user.setFirstname(request.getFirstname());
@@ -72,8 +70,10 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPasswordHash()));
         user.setPhoneNumber(request.getPhoneNumber());
-        user.setRole("USER");
         userRepository.save(user);
+
+
+
         return userMapper.toResponseDTO(user);
     }
 }

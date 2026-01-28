@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/deliveryAddress")
+@RequestMapping("api/v1/deliveryAddress")
 public class DeliveryAddressController {
     private final DeliveryAddressService deliveryAddressService;
     public DeliveryAddressController(DeliveryAddressService deliveryAddressService) {
