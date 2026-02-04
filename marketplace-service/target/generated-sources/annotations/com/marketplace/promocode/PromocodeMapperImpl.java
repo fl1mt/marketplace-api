@@ -1,0 +1,65 @@
+package com.marketplace.promocode;
+
+import com.marketplace.product.Product;
+import com.marketplace.product.ProductRequestDTO;
+import com.marketplace.product.ProductResponseDTO;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = "org.mapstruct.ap.MappingProcessor",
+    date = "2026-02-05T01:53:00+0500",
+    comments = "version: 1.6.2, compiler: javac, environment: Java 24.0.2 (Oracle Corporation)"
+)
+@Component
+public class PromocodeMapperImpl implements PromocodeMapper {
+
+    @Override
+    public Promocode toEntity(ProductRequestDTO requestDTO) {
+        if ( requestDTO == null ) {
+            return null;
+        }
+
+        Promocode promocode = new Promocode();
+
+        return promocode;
+    }
+
+    @Override
+    public ProductResponseDTO toResponseDTO(Product product) {
+        if ( product == null ) {
+            return null;
+        }
+
+        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+
+        productResponseDTO.setDescription( product.getDescription() );
+        productResponseDTO.setBasePrice( product.getBasePrice() );
+        productResponseDTO.setName( product.getName() );
+        productResponseDTO.setId( product.getId() );
+        productResponseDTO.setCategory( product.getCategory() );
+        productResponseDTO.setDiscountPercentage( product.getDiscountPercentage() );
+        productResponseDTO.setInventoryStock( product.getInventoryStock() );
+        productResponseDTO.setAverageRating( product.getAverageRating() );
+        productResponseDTO.setReviewCount( product.getReviewCount() );
+        productResponseDTO.setFinalPrice( product.getFinalPrice() );
+
+        return productResponseDTO;
+    }
+
+    @Override
+    public List<ProductResponseDTO> toResponseDtoList(List<Product> products) {
+        if ( products == null ) {
+            return null;
+        }
+
+        List<ProductResponseDTO> list = new ArrayList<ProductResponseDTO>( products.size() );
+        for ( Product product : products ) {
+            list.add( toResponseDTO( product ) );
+        }
+
+        return list;
+    }
+}
