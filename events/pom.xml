@@ -1,0 +1,13 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.marketplace</groupId>
+        <artifactId>marketplace-system</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>events</artifactId>
+
+
+</project>
