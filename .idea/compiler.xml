@@ -6,15 +6,20 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="marketplace" />
+        <module name="marketplace-service" />
+        <module name="events" />
         <module name="logistic-service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="marketplace" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="events" options="" />
       <module name="logistic-service" options="-parameters" />
-      <module name="marketplace" options="-parameters" />
+      <module name="marketplace" options="" />
     </option>
   </component>
 </project>
