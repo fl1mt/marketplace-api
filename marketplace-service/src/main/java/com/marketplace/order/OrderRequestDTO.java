@@ -10,7 +10,6 @@ import java.util.UUID;
 public class OrderRequestDTO {
     @NotNull(message = "Delivery address is required!")
     private UUID deliveryAddressId;
-    private LocalDate deliveryDate;
     private List<OrderItemRequestDTO> items;
     public void setDeliveryAddressId(UUID deliveryAddressId) {
         this.deliveryAddressId = deliveryAddressId;
@@ -18,14 +17,6 @@ public class OrderRequestDTO {
 
     public UUID getDeliveryAddressId() {
         return deliveryAddressId;
-    }
-
-    public void setDeliveryDate(LocalDate deliveryDate) {
-        this.deliveryDate = deliveryDate;
-    }
-
-    public LocalDate getDeliveryDate() {
-        return deliveryDate;
     }
 
     public void setItems(List<OrderItemRequestDTO> items) {

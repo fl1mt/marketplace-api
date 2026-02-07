@@ -125,6 +125,8 @@ public class OrderService {
 
             orderResponseDTO.setItems(itemsDTO);
             responseDTOs.add(orderResponseDTO);
+            System.out.println(order.getShippingCost() + "--------");
+
         }
 
         return responseDTOs;

@@ -31,7 +31,6 @@ public class DeliveryCalculatedConsumer {
 
         order.setDeliveryDate(event.deliveryDate());
         order.setShippingCost(event.deliveryPrice());
-
         ordersRepository.save(order);
     }
 }

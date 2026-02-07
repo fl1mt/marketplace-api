@@ -10,5 +10,10 @@ public interface OrderMapper {
     Order toEntity(OrderRequestDTO requestDTO);
     @Mapping(target = "userPublicDTO", source = "user")
     @Mapping(target = "deliveryAddressResponseDTO", source = "address")
+    @Mapping(target = "shippingCost", source = "shippingCost")
+    @Mapping(target = "deliveryDate", source = "deliveryDate")
+    @Mapping(target = "subtotal", source = "subtotal")
+    @Mapping(target = "finalTotal", source = "finalTotal")
+    @Mapping(target = "createdAt", source = "createdAt")
     OrderResponseDTO toResponseDTO(Order order);
 }
