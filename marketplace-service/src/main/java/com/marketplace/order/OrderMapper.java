@@ -15,5 +15,6 @@ public interface OrderMapper {
     @Mapping(target = "subtotal", source = "subtotal")
     @Mapping(target = "finalTotal", source = "finalTotal")
     @Mapping(target = "createdAt", source = "createdAt")
+    @Mapping(target = "orderStatus", source = "orderStatus")
     OrderResponseDTO toResponseDTO(Order order);
 }

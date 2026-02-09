@@ -14,6 +14,7 @@ public class OrderResponseDTO {
     private UUID id;
     private UserPublicDTO userPublicDTO;
     private DeliveryAddressResponseDTO deliveryAddressResponseDTO;
+    private OrderStatus orderStatus;
     private LocalDate deliveryDate;
     private BigDecimal shippingCost;
     private BigDecimal subtotal;
@@ -91,5 +92,13 @@ public class OrderResponseDTO {
 
     public BigDecimal getShippingCost() {
         return shippingCost;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
     }
 }
