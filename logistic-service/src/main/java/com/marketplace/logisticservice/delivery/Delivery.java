@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -20,6 +21,8 @@ public class Delivery {
     @Column
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
+    @Column(nullable = false)
+    private LocalDateTime statusUpdatedAt;
 
     public void setId(Long id) {
         this.id = id;
@@ -59,5 +62,13 @@ public class Delivery {
 
     public DeliveryStatus getDeliveryStatus() {
         return deliveryStatus;
+    }
+
+    public void setStatusUpdatedAt(LocalDateTime statusUpdatedAt) {
+        this.statusUpdatedAt = statusUpdatedAt;
+    }
+
+    public LocalDateTime getStatusUpdatedAt() {
+        return statusUpdatedAt;
     }
 }

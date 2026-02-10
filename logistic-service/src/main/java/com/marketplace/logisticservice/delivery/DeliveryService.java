@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +46,7 @@ public class DeliveryService {
         delivery.setShippingCost(deliveryPrice);
         delivery.setDeliveryDate(deliveryDate);
         delivery.setDeliveryStatus(DeliveryStatus.CONFIRMED);
+        delivery.setStatusUpdatedAt(LocalDateTime.now());
 
         deliveryRepository.save(delivery);
 
@@ -68,6 +70,7 @@ public class DeliveryService {
         }
 
         delivery.setDeliveryStatus(DeliveryStatus.IN_TRANSIT);
+        delivery.setStatusUpdatedAt(LocalDateTime.now());
         deliveryRepository.save(delivery);
 
         deliveryInTransitProducer.send(new DeliveryInTransitEvent(orderId));
