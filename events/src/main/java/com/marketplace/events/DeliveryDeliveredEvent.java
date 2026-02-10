@@ -1,4 +1,5 @@
 package com.marketplace.events;
 
-public class DeliveryDeliveredEvent {
-}
+import java.util.UUID;
+
+public record DeliveryDeliveredEvent(UUID orderId) { }

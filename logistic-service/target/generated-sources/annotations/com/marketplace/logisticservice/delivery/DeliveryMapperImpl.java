@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-11T02:33:27+0500",
+    date = "2026-02-11T03:19:19+0500",
     comments = "version: 1.6.2, compiler: javac, environment: Java 24.0.2 (Amazon.com Inc.)"
 )
 @Component
@@ -26,6 +26,7 @@ public class DeliveryMapperImpl implements DeliveryMapper {
         deliveryResponse.setShippingCost( delivery.getShippingCost() );
         deliveryResponse.setDeliveryDate( delivery.getDeliveryDate() );
         deliveryResponse.setDeliveryStatus( delivery.getDeliveryStatus() );
+        deliveryResponse.setStatusUpdatedAt( delivery.getStatusUpdatedAt() );
 
         return deliveryResponse;
     }
