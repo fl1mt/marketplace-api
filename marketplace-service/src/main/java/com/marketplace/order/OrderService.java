@@ -73,9 +73,9 @@ public class OrderService {
     public List<OrderResponseDTO> getUsersOrders(UUID userId, boolean onlyActiveOrders){
         User user = dataAuthService.checkUsersId(userId);
 
-        List<Order> orders = onlyActiveOrders ? ordersRepository.findAllByUserId(user.getId())
-                : ordersRepository.findByUserIdAndOrderStatusNotIn(userId,
-                List.of(OrderStatus.COMPLETED, OrderStatus.CANCELED));
+        List<Order> orders = onlyActiveOrders ? ordersRepository.findByUserIdAndOrderStatusNotIn(userId,
+                List.of(OrderStatus.COMPLETED, OrderStatus.CANCELED)) :
+        ordersRepository.findAllByUserId(user.getId());
 
         if(orders.isEmpty()){
             return List.of();
@@ -131,7 +131,7 @@ public class OrderService {
                     .orElseThrow(() ->
                             new NotFoundException("Product not found, id=" + itemDTO.getProductId())
                     );
-
+            //add check product in data auth service
             OrderItem item = new OrderItem();
             item.setOrder(order);
             item.setProduct(product);
@@ -168,13 +168,20 @@ public class OrderService {
     }
 
     private void requestDelivery(Order order) {
-
         order.setOrderStatus(OrderStatus.DELIVERY_REQUESTED);
         ordersRepository.save(order);
 
         orderEventProducer.sendOrderCreatedEvent(order);
     }
 
+    @Transactional
+    public void receiveOrderByUser(UUID userId, UUID orderId) {
+        Order order = dataAuthService.checkOrdersAffiliation(orderId, userId);
 
+        if(!order.getOrderStatus().equals(OrderStatus.WAITING_FOR_RECEIVE))
+        {throw new BadRequestException("The order must have is waiting to receive status.");}
 
+        order.setOrderStatus(OrderStatus.COMPLETED);
+        ordersRepository.save(order);
+    }
 }
