@@ -2,6 +2,7 @@ package com.marketplace.logisticservice.delivery;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class DeliveryResponse {
@@ -10,6 +11,7 @@ public class DeliveryResponse {
     private BigDecimal shippingCost;
     private LocalDate deliveryDate;
     private DeliveryStatus deliveryStatus;
+    private LocalDateTime statusUpdatedAt;
 
     public void setId(Long id) {
         this.id = id;
@@ -49,5 +51,13 @@ public class DeliveryResponse {
 
     public DeliveryStatus getDeliveryStatus() {
         return deliveryStatus;
+    }
+
+    public void setStatusUpdatedAt(LocalDateTime statusUpdatedAt) {
+        this.statusUpdatedAt = statusUpdatedAt;
+    }
+
+    public LocalDateTime getStatusUpdatedAt() {
+        return statusUpdatedAt;
     }
 }
