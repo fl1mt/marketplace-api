@@ -56,7 +56,7 @@ public class DataAuthService {
     }
 
     public List<OrderItem> checkOrderItemsByOrder(UUID orderId){
-        List<OrderItem> orderItems = orderItemsRepository.findAllByOrderId(orderId);
+        List<OrderItem> orderItems = orderItemsRepository.findByOrderIdWithProducts(orderId);
         if(orderItems == null || orderItems.isEmpty()){
             throw new BadRequestException("Order must contain at least one item");
         }
