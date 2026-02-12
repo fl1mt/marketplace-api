@@ -3,19 +3,18 @@ package com.marketplace.order;
 import com.marketplace.delivery.DeliveryAddress;
 import com.marketplace.errors.BadRequestException;
 import com.marketplace.kafka.producer.OrderEventProducer;
-import com.marketplace.order.orderDiscount.OrderDiscountService;
 import com.marketplace.orderItem.OrderItem;
 import com.marketplace.orderItem.OrderItemRequestDTO;
 import com.marketplace.orderItem.OrderItemResponseDTO;
-import com.marketplace.errors.NotFoundException;
 import com.marketplace.orderItem.OrderItemMapper;
 import com.marketplace.orderItem.OrderItemsRepository;
 import com.marketplace.product.Product;
-import com.marketplace.product.ProductsRepository;
 import com.marketplace.user.auth.DataAuthService;
 import com.marketplace.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -32,20 +31,16 @@ public class OrderService {
     private final OrderItemMapper orderItemMapper;
     private final OrdersRepository ordersRepository;
     private final OrderItemsRepository orderItemsRepository;
-    private final ProductsRepository productsRepository;
-    private final OrderDiscountService discountStrategyService;
     private final OrderEventProducer orderEventProducer;
 
     public OrderService(DataAuthService dataAuthService, OrderMapper orderMapper,
                         OrderItemMapper orderItemMapper, OrdersRepository ordersRepository,
-                        OrderItemsRepository orderItemsRepository, ProductsRepository productsRepository, OrderDiscountService discountStrategyService, OrderEventProducer orderEventProducer) {
+                        OrderItemsRepository orderItemsRepository, OrderEventProducer orderEventProducer) {
         this.dataAuthService = dataAuthService;
         this.orderMapper = orderMapper;
         this.orderItemMapper = orderItemMapper;
         this.ordersRepository = ordersRepository;
         this.orderItemsRepository = orderItemsRepository;
-        this.productsRepository = productsRepository;
-        this.discountStrategyService = discountStrategyService;
         this.orderEventProducer = orderEventProducer;
     }
 
@@ -58,12 +53,10 @@ public class OrderService {
         DeliveryAddress deliveryAddress = dataAuthService.checkUsersDeliveryAddress(orderRequestDTO.getDeliveryAddressId(), userId);
 
         Order newOrder = createDraftOrder(user, deliveryAddress, orderRequestDTO);
+        ordersRepository.save(newOrder);
 
         List<OrderItem> orderItems = createOrderItems(newOrder, orderRequestDTO.getItems());
-
-        calculateTotals(newOrder, orderItems);
-
-        ordersRepository.save(newOrder);
+        orderItemsRepository.saveAll(orderItems);
 
         requestDelivery(newOrder);
 
@@ -105,6 +98,17 @@ public class OrderService {
         return responseDTOs;
     }
 
+    @Transactional
+    public void receiveOrderByUser(UUID userId, UUID orderId) {
+        Order order = dataAuthService.checkOrdersAffiliation(orderId, userId);
+
+        if(!order.getOrderStatus().equals(OrderStatus.WAITING_FOR_RECEIVE))
+        {throw new BadRequestException("The order must have is waiting to receive status.");}
+
+        order.setOrderStatus(OrderStatus.COMPLETED);
+        ordersRepository.save(order);
+    }
+
     private void validateOrderRequest(OrderRequestDTO request) {
         if (request.getItems() == null || request.getItems().isEmpty()) {
             throw new BadRequestException("Order must contain at least one item");
@@ -119,7 +123,7 @@ public class OrderService {
         order.setDiscountAmount(BigDecimal.ZERO);
         order.setFinalTotal(BigDecimal.ZERO);
         order.setOrderStatus(OrderStatus.CREATED);
-        return ordersRepository.save(order);
+        return order;
     }
 
     private List<OrderItem> createOrderItems(Order order, List<OrderItemRequestDTO> items) {
@@ -127,38 +131,17 @@ public class OrderService {
         List<OrderItem> result = new ArrayList<>();
 
         for (OrderItemRequestDTO itemDTO : items) {
-            Product product = productsRepository.findById(itemDTO.getProductId())
-                    .orElseThrow(() ->
-                            new NotFoundException("Product not found, id=" + itemDTO.getProductId())
-                    );
-            //add check product in data auth service
+            Product product = dataAuthService.checkProduct(itemDTO.getProductId());
             OrderItem item = new OrderItem();
             item.setOrder(order);
             item.setProduct(product);
             item.setQuantity(itemDTO.getQuantity());
             item.setPriceAtPurchase(product.getFinalPrice());
 
-            result.add(orderItemsRepository.save(item));
+            result.add(item);
         }
 
         return result;
-    }
-
-    private void calculateTotals(Order order, List<OrderItem> items) {
-
-        BigDecimal subtotal = items.stream()
-                .map(item ->
-                        item.getPriceAtPurchase()
-                                .multiply(BigDecimal.valueOf(item.getQuantity()))
-                )
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        order.setSubtotal(subtotal);
-
-        BigDecimal discount = discountStrategyService.calculateTotalOrderDiscount(order);
-        order.setDiscountAmount(discount);
-
-        order.setFinalTotal(subtotal.subtract(discount));
     }
 
     private OrderResponseDTO buildResponse(Order order, List<OrderItem> items) {
@@ -169,19 +152,13 @@ public class OrderService {
 
     private void requestDelivery(Order order) {
         order.setOrderStatus(OrderStatus.DELIVERY_REQUESTED);
-        ordersRepository.save(order);
-
-        orderEventProducer.sendOrderCreatedEvent(order);
-    }
-
-    @Transactional
-    public void receiveOrderByUser(UUID userId, UUID orderId) {
-        Order order = dataAuthService.checkOrdersAffiliation(orderId, userId);
-
-        if(!order.getOrderStatus().equals(OrderStatus.WAITING_FOR_RECEIVE))
-        {throw new BadRequestException("The order must have is waiting to receive status.");}
-
-        order.setOrderStatus(OrderStatus.COMPLETED);
-        ordersRepository.save(order);
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        orderEventProducer.sendOrderCreatedEvent(order);
+                    }
+                }
+        );
     }
 }

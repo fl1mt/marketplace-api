@@ -46,6 +46,9 @@ public class Order {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    @Version
+    @Column(nullable = false)
+    private Long version;
 
     public void setId(UUID id) {
         this.id = id;
@@ -142,5 +145,13 @@ public class Order {
 
     public OrderStatus getOrderStatus() {
         return orderStatus;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public Long getVersion() {
+        return version;
     }
 }
