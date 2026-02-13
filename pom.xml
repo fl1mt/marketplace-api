@@ -10,6 +10,7 @@
         <module>events</module>
         <module>marketplace-service</module>
         <module>logistic-service</module>
+        <module>notification-service</module>
     </modules>
 
     <properties>
