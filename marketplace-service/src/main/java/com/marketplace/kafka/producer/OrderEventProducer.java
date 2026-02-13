@@ -1,5 +1,6 @@
 package com.marketplace.kafka.producer;
 import com.marketplace.events.OrderCreatedEvent;
+import com.marketplace.events.OrderStatusChangedEvent;
 import com.marketplace.order.Order;
 import com.marketplace.order.OrderStatus;
 import com.marketplace.order.OrdersRepository;
@@ -9,8 +10,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderEventProducer {
 
-    private final KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate;
-    public OrderEventProducer(KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate) {
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    public OrderEventProducer(KafkaTemplate<String, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -26,6 +27,23 @@ public class OrderEventProducer {
 
         kafkaTemplate.send(
                 "order-created",
+                order.getId().toString(),
+                event
+        );
+    }
+
+    public void sendOrderChangedStatusEvent(Order order){
+
+        OrderStatusChangedEvent event = new OrderStatusChangedEvent(
+                order.getOrderStatus().toString(),
+                order.getUser().getId(),
+                order.getId(),
+                order.getUser().getEmail(),
+                order.getUser().getPhoneNumber()
+        );
+
+        kafkaTemplate.send(
+                "order-status-changed",
                 order.getId().toString(),
                 event
         );
