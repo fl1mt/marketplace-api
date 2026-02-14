@@ -1,6 +1,7 @@
 package com.marketplace.notificationservice.notification;
 
 import com.marketplace.events.OrderStatusChangedEvent;
+import com.marketplace.notificationservice.errors.BadRequestException;
 import com.marketplace.notificationservice.errors.NotFoundException;
 import com.marketplace.notificationservice.notification.enums.NotificationChannel;
 import com.marketplace.notificationservice.notification.enums.NotificationStatus;
@@ -37,8 +38,8 @@ public class NotificationService {
         try {
             type = NotificationType.valueOf(event.status().name());
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Unsupported notification type: " + event.status());
-        } // add rest controller advice
+            throw new BadRequestException("Unsupported notification type: " + event.status());
+        }
 
         notification.setUserId(event.userId());
         notification.setType(type);
@@ -46,7 +47,7 @@ public class NotificationService {
         notification.setRecipient(getNotificationRecipient(notification.getChannel(), event));
         notification.setStatus(NotificationStatus.PENDING);
         notification.setMessage(setMessageNotification(notification.getType()));
-        notification.setTitle("Заказ №" + event.orderId()); //временно затычка в виде UUID
+        notification.setTitle("Заказ №" + event.orderId()); // временно затычка в виде UUID
 
         notificationRepository.save(notification);
         System.out.println("SEND NOTIFICATION \n Channel: "
