@@ -1,4 +1,4 @@
-package com.marketplace.order;
+package com.marketplace.events;
 
 public enum OrderStatus {
     CREATED,
