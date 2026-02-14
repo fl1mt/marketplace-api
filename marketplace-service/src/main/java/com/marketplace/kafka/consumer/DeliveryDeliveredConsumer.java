@@ -1,5 +1,6 @@
 package com.marketplace.kafka.consumer;
 
+import com.marketplace.errors.BadRequestException;
 import com.marketplace.events.DeliveryDeliveredEvent;
 import com.marketplace.kafka.producer.OrderEventProducer;
 import com.marketplace.order.Order;
@@ -37,6 +38,10 @@ public class DeliveryDeliveredConsumer {
 
         Order order = dataAuthService.checkOrder(event.orderId());
 
+        if(order.getOrderStatus() != OrderStatus.IN_TRANSIT){
+            throw new BadRequestException("The order must have in transit status.");
+        }
+
         order.setOrderStatus(OrderStatus.WAITING_FOR_RECEIVE);
         order.setDeliveryDate(LocalDate.now());
         ordersRepository.save(order);
@@ -45,7 +50,6 @@ public class DeliveryDeliveredConsumer {
                 new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
-                        System.out.println("DELIVERY DELIVERED SEND NOTIFICATION");
                         producer.sendOrderChangedStatusEvent(order);
                     }
                 }

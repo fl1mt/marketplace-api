@@ -1,5 +1,6 @@
 package com.marketplace.kafka.consumer;
 
+import com.marketplace.errors.BadRequestException;
 import com.marketplace.events.DeliveryCalculatedEvent;
 import com.marketplace.events.OrderStatus;
 import com.marketplace.kafka.producer.OrderEventProducer;
@@ -41,7 +42,7 @@ public class DeliveryCalculatedConsumer {
         Order order = dataAuthService.checkOrder(event.orderId());
 
         if (order.getOrderStatus() != OrderStatus.DELIVERY_REQUESTED) {
-            return;
+            throw new BadRequestException("The order must have delivery requested status.");
         }
 
         order.setDeliveryDate(event.deliveryDate());
@@ -58,7 +59,6 @@ public class DeliveryCalculatedConsumer {
                 new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
-                        System.out.println("DELIVERY CONFIRMED SEND NOTIFICATION");
                         producer.sendOrderChangedStatusEvent(order);
                     }
                 }

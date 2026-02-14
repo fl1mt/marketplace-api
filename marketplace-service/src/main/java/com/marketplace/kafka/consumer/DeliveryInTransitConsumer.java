@@ -1,5 +1,6 @@
 package com.marketplace.kafka.consumer;
 
+import com.marketplace.errors.BadRequestException;
 import com.marketplace.events.DeliveryInTransitEvent;
 import com.marketplace.kafka.producer.OrderEventProducer;
 import com.marketplace.order.Order;
@@ -35,8 +36,8 @@ public class DeliveryInTransitConsumer {
 
         Order order = dataAuthService.checkOrder(event.orderId());
 
-        if (order.getOrderStatus() == OrderStatus.IN_TRANSIT) {
-            return;
+        if (order.getOrderStatus() != OrderStatus.DELIVERY_CONFIRMED) {
+            throw new BadRequestException("The order must have delivery confirmed status.");
         }
 
         order.setOrderStatus(OrderStatus.IN_TRANSIT);
@@ -46,7 +47,6 @@ public class DeliveryInTransitConsumer {
                 new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
-                        System.out.println("DELIVERY IN TRANSIT SEND NOTIFICATION");
                         producer.sendOrderChangedStatusEvent(order);
                     }
                 }
