@@ -29,6 +29,13 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<Void> cancelOrderByUser(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                  @PathVariable("orderId") UUID orderId){
+        orderService.cancelOrderByUser(userDetails.getId(), orderId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping
     public ResponseEntity<List<OrderResponseDTO>> getUserOrders(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                 @RequestParam(name = "onlyActiveOrders", defaultValue = "true")
