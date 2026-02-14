@@ -5,5 +5,6 @@ public enum NotificationType {
     IN_TRANSIT,
     WAITING_FOR_RECEIVE,
     COMPLETED,
-    CANCELED
+    CANCELLED,
+    CANCELLED_BY_USER
 }

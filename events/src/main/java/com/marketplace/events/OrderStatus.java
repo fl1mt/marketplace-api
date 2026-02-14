@@ -7,6 +7,6 @@ public enum OrderStatus {
     IN_TRANSIT,
     WAITING_FOR_RECEIVE,
     COMPLETED,
-    CANCELED_BY_USER,
-    CANCELED
+    CANCELLED_BY_USER,
+    CANCELLED
 }

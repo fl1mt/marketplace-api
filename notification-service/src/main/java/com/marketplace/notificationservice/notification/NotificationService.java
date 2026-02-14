@@ -76,7 +76,8 @@ public class NotificationService {
             case IN_TRANSIT -> "Заказ уже в пути!";
             case WAITING_FOR_RECEIVE -> "Заказ прибыл и готов к получению :)";
             case COMPLETED -> "Заказ был успешно получен. Пожалуйста, оцените товары";
-            case CANCELED -> "Заказ был отменён.";
+            case CANCELLED_BY_USER -> "Вы отменили заказ.";
+            case CANCELLED -> "Заказ был отменён. Извините за неудобства.";
         };
     }
 }
