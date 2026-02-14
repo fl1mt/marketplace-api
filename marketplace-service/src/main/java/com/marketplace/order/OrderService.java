@@ -71,8 +71,8 @@ public class OrderService {
     public List<OrderResponseDTO> getUsersOrders(UUID userId, boolean onlyActiveOrders){
         User user = dataAuthService.checkUsersId(userId);
 
-        List<Order> orders = onlyActiveOrders ? ordersRepository.findByUserIdAndOrderStatusNotIn(userId,
-                List.of(OrderStatus.COMPLETED, OrderStatus.CANCELED)) :
+        List<Order> orders = onlyActiveOrders ? ordersRepository.findByUserIdAndOrderStatusNotIn(user.getId(),
+                List.of(OrderStatus.COMPLETED, OrderStatus.CANCELED_BY_USER, OrderStatus.CANCELED)) :
         ordersRepository.findAllByUserId(user.getId());
 
         if(orders.isEmpty()){
@@ -101,6 +101,31 @@ public class OrderService {
         }
 
         return responseDTOs;
+    }
+
+    @Transactional
+    public void cancelOrderByUser(UUID userId, UUID orderId){
+        Order order = dataAuthService.checkOrdersAffiliation(orderId, userId);
+
+        switch (order.getOrderStatus()){
+            case DELIVERY_CONFIRMED -> {} // logistic service send kafka event
+            case IN_TRANSIT -> throw new BadRequestException
+                    ("The order is on the way. You can cancel it when it arrives.");
+            case WAITING_FOR_RECEIVE -> { }// logistic service send kafka event
+            default -> {
+                order.setOrderStatus(OrderStatus.CANCELED_BY_USER);}
+        };
+
+        ordersRepository.save(order);
+
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        orderEventProducer.sendOrderChangedStatusEvent(order);
+                    }
+                }
+        );
     }
 
     @Transactional
@@ -165,6 +190,9 @@ public class OrderService {
     }
 
     private void requestDelivery(Order order) {
+        if(order.getOrderStatus() != OrderStatus.CREATED){
+            throw new BadRequestException("The order must have created status.");
+        }
         order.setOrderStatus(OrderStatus.DELIVERY_REQUESTED);
         TransactionSynchronizationManager.registerSynchronization(
                 new TransactionSynchronization() {
