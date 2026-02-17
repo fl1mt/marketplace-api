@@ -10,6 +10,7 @@ import com.marketplace.orderItem.OrderItemResponseDTO;
 import com.marketplace.orderItem.OrderItemMapper;
 import com.marketplace.orderItem.OrderItemsRepository;
 import com.marketplace.product.Product;
+import com.marketplace.product.stock.StockService;
 import com.marketplace.user.auth.DataAuthService;
 import com.marketplace.user.User;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,7 @@
 package com.marketplace.product;
 
-import jakarta.validation.Path;
+import com.marketplace.product.stock.StockAdjustmentRequest;
+import com.marketplace.product.stock.StockService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,8 +14,10 @@ import java.util.UUID;
 @RequestMapping("api/v1/products/")
 public class ProductController {
     private final ProductService productService;
-    public ProductController(ProductService productService) {
+    private final StockService stockService;
+    public ProductController(ProductService productService, StockService stockService) {
         this.productService = productService;
+        this.stockService = stockService;
     }
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> getProducts(){
@@ -34,5 +37,12 @@ public class ProductController {
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable("productId") UUID productId){
         return ResponseEntity.ok(productService.getProduct(productId));
+    }
+
+    @PostMapping("/{productId}/stock-adjustments")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<Void> adjustProductStock(@PathVariable("productId") UUID productId, @RequestBody StockAdjustmentRequest request){
+        stockService.adjustStock(productId, request.amount());
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,4 +1,4 @@
-package com.marketplace.order;
+package com.marketplace.product.stock;
 
 import com.marketplace.errors.BadRequestException;
 import com.marketplace.orderItem.OrderItem;
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class StockService {
@@ -39,6 +40,16 @@ public class StockService {
                 throw new BadRequestException("Product not found! Product id: " +
                         item.getProduct().getId());
             }
+        }
+    }
+
+    @Transactional
+    public void adjustStock(UUID productId, int amount){
+        int updated = productsRepository.adjustStock(productId, amount);
+
+        if(updated == 0){
+            throw new BadRequestException("Product not found! Product id: " +
+                    productId);
         }
     }
 }

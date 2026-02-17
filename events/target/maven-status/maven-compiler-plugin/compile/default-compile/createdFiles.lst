@@ -1,0 +1,7 @@
+com\marketplace\events\DeliveryDeliveredEvent.class
+com\marketplace\events\DeliveryInTransitEvent.class
+com\marketplace\events\OrderCreatedEvent.class
+com\marketplace\events\OrderStatusChangedEvent.class
+com\marketplace\events\DeliveryCalculatedEvent.class
+com\marketplace\events\OrderStatus.class
+com\marketplace\events\OrderCancelledEvent.class

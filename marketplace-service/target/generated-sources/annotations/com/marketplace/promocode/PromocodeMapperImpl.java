@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-14T04:44:40+0500",
-    comments = "version: 1.6.2, compiler: javac, environment: Java 24.0.2 (Amazon.com Inc.)"
+    date = "2026-02-18T03:38:53+0500",
+    comments = "version: 1.6.2, compiler: javac, environment: Java 17.0.16 (Eclipse Adoptium)"
 )
 @Component
 public class PromocodeMapperImpl implements PromocodeMapper {
